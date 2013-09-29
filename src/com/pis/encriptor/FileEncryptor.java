@@ -93,7 +93,7 @@ public class FileEncryptor{
 	}
 
 	public static void main (String[] args)throws Exception {
-		FileEncryptor.encrypt("/home/fernando/bin","/home/fernando/prueba1.enc.txt","12345678913");
-		FileEncryptor.decrypt("/home/fernando/bin","/home/fernando/prueba1.dec.txt","");
+		FileEncryptor.encrypt("./prueba/uno.txt","./prueba/uno.enc.txt","12345678913");
+		FileEncryptor.decrypt("./prueba/uno.enc.txt","./prueba/uno.dec.txt","12345678913");
 	}
 }
