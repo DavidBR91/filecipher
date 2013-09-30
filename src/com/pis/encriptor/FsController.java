@@ -1,13 +1,13 @@
 package com.pis.encriptor;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 public class FsController {
@@ -21,18 +21,30 @@ public class FsController {
 	    }
 	    return fileTree;
 	}
+	
+	public static void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
+	    if (sourceLocation.isDirectory()) {
+	        if (!targetLocation.exists()) {
+	            targetLocation.mkdir();
+	        }
 
-    public static void main(String[] args) {
-        //System.out.println(FsController.walk(".", new LinkedList<File>()).toString());
-    	Collection<String> files= FsController.listFileTree(".");
-    	for(String f : files){
-    		try {
-    			System.out.println(f);
-				FileEncryptor.encrypt(f, "hols", "1234");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    }
+	        String[] children = sourceLocation.list();
+	        for (int i=0; i<children.length; i++) {
+	            copyDirectory(new File(sourceLocation, children[i]),
+	                    new File(targetLocation, children[i]));
+	        }
+	    } else {
+
+	        InputStream in = new FileInputStream(sourceLocation);
+	        OutputStream out = new FileOutputStream(targetLocation);
+
+	        byte[] buf = new byte[1024];
+	        int len;
+	        while ((len = in.read(buf)) > 0) {
+	            out.write(buf, 0, len);
+	        }
+	        in.close();
+	        out.close();
+	    }
+	}
 }
