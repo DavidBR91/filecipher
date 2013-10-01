@@ -14,22 +14,44 @@ import org.apache.commons.cli.ParseException;
 
 public class Cipher {
 
-    public static void compruebaPath(String path) {
-        File fRuta = new File(path);
+    public static int compruebaFlags(boolean encriptar, boolean keep,
+            String path) {
+        int resultado = 0;
 
+        if (encriptar && keep) {
+            if (esDirectorio(path)) {
+                resultado = 0;
+            } else {
+                resultado = 1;
+            }
+        } else if (encriptar && !keep) {
+            if (esDirectorio(path)) {
+                resultado = 2;
+            } else {
+                resultado = 3;
+            }
+        } else if (!encriptar) {
+            if (esDirectorio(path)) {
+                resultado = 4;
+            } else {
+                resultado = 5;
+            }
+        }
+        return resultado;
+    }
+
+    public static boolean esDirectorio(String path) {
+        File fRuta = new File(path);
         if (fRuta.isDirectory()) {
-            recursiveEncrypt(String path);
+            return true;
         } else {
-            //El output no debería estar si el flag keep no esta activo
-            FileEncryptor.encrypt(path, path, path);
+            return false;
         }
     }
 
     public static void main(String[] args) {
-
-        String path = "";
-        CommandLineParser parser = null;
-        CommandLine cmdLine = null;
+        CommandLineParser parser;
+        CommandLine cmdLine;
         boolean flagEncrypt = true; //Por defecto encripta
         boolean keep = false;   //Por defecto está desactivado
 
@@ -69,11 +91,51 @@ public class Cipher {
 
             final String[] remainingArgs = cmdLine.getArgs();
 
-            if (remainingArgs.length != 1) {
+            //Compruebas  -e -d y -k
+            //Comprueba si es directorio
+            //Comprueba si es -e o -d
+            //Si es -e:
+            //4 posibles caminos:
+            //Es dir y Keep activo
+            //Es fich y Keep activo
+            //Dir y Keep des
+            //Fich y Keep des
+            //Si es -d:
+            //Es dir
+            //Es fich
+            //
+            if (false) {
                 System.err.println("Error en los parametros");
             } else {
-                //Ejecuta el algoritmo  
-                compruebaPath(remainingArgs[0]);
+                String path = remainingArgs[0];
+                String password = remainingArgs[1];
+                int flags;
+                //Ejecuta el algoritmo
+                flags = compruebaFlags(flagEncrypt, keep, path);
+
+                switch (flags) {
+                    case (0):
+                        //recursiveEncrypt(path, path+".enc", password;
+                        break;
+                    case (1):
+                        FileEncryptor.encrypt(path, path + ".enc", password);
+                        break;
+                    case (2):
+                        //recursiveEncrypt(path, path, password);
+                        break;
+                    case (3):
+                        FileEncryptor.encrypt(path, path, password);
+                    case (4):
+                        //recursiveDecrypt(path, path, password);
+                        break;
+                    case (5):
+                        FileEncryptor.decrypt(path, path, password);
+                        break;
+                    default:
+                        System.err.println("Error de las opciones");
+                        break;
+                }
+
             }
 
         } catch (ParseException ex) {
@@ -81,6 +143,8 @@ public class Cipher {
         } catch (java.lang.NumberFormatException ex) {
             // Error, imprimimos la ayuda  
             new HelpFormatter().printHelp(Cipher.class.getCanonicalName(), options);
+        } catch (Exception ex) {
+            Logger.getLogger(Cipher.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
