@@ -1,8 +1,10 @@
 package com.pis.encriptor;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -48,6 +50,24 @@ public class Cipher {
             return false;
         }
     }
+    
+	public static void recursiveEncryptor (String input, String output, String password) throws Exception {
+		File source = new File(input);
+		File destiny = new File(output);
+		FsController.copyDirectory(source, destiny);
+		
+		Collection<String> files = FsController.listFileTree(output);
+		for (String f: files) {
+			FileEncryptor.encrypt(f,password, false);
+		}
+	}
+	
+	public static void recursiveDecryptor (String path, String password) throws Exception {
+		Collection<String> files = FsController.listFileTree(path);
+		for (String f: files) {
+			FileEncryptor.decrypt(f, password, false);
+		}
+	}
 
     public static void main(String[] args) {
         CommandLineParser parser;
