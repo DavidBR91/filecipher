@@ -45,7 +45,6 @@ public class Cipher {
 		
 		if(keep){
 			File destiny = new File (source.getAbsolutePath() + ".enc");
-			System.out.println(destiny.getAbsolutePath());
 			FsController.copyDirectory(source, destiny);
 			files = FsController.listFileTree(destiny.getAbsolutePath());
 		}
@@ -127,7 +126,7 @@ public class Cipher {
                 //Ejecuta el algoritmo
                 int flags = checkFlags(flagEncrypt, path);
                 
-                System.out.println((flagEncrypt) ? "Encriptando" : "Desencriptando " + " directorios o archivos...");
+                System.out.println(((flagEncrypt) ? "Encriptando" : "Desencriptando ") + " directorios o archivos...");
                 
                 switch(flags){
             	case 0 :
