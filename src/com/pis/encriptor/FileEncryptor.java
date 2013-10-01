@@ -41,10 +41,6 @@ public class FileEncryptor{
 		File filein, fileout;
 		filein=new File(input);
 		fileout=new File(output);
-		
-		if(filein.equals(fileout)){
-			System.out.println("HOLA!");
-		}
 
 		FileInputStream fis =new FileInputStream(filein);
 		FileOutputStream fos =new FileOutputStream(fileout);

@@ -16,30 +16,17 @@ import org.apache.commons.cli.ParseException;
 
 public class Cipher {
 
-    public static int compruebaFlags(boolean encriptar, boolean keep,
+    public static int checkFlags(boolean encrypt,
             String path) {
-        int resultado = 0;
-
-        if (encriptar && keep) {
-            if (esDirectorio(path)) {
-                resultado = 0;
-            } else {
-                resultado = 1;
-            }
-        } else if (encriptar && !keep) {
-            if (esDirectorio(path)) {
-                resultado = 2;
-            } else {
-                resultado = 3;
-            }
-        } else if (!encriptar) {
-            if (esDirectorio(path)) {
-                resultado = 4;
-            } else {
-                resultado = 5;
-            }
-        }
-        return resultado;
+    	
+    	int fencrypt = 1;
+    	int fdir = 2;
+    			
+    	if(!encrypt) fencrypt = 0;
+    	if(!esDirectorio(path)) fdir = 0;
+    	
+    	return fdir | fencrypt;
+        
     }
 
     public static boolean esDirectorio(String path) {
@@ -51,12 +38,20 @@ public class Cipher {
         }
     }
     
-	public static void recursiveEncryptor (String input, String output, String password) throws Exception {
+	public static void recursiveEncryptor (String input, String password, boolean keep) throws Exception {
 		File source = new File(input);
-		File destiny = new File(output);
-		FsController.copyDirectory(source, destiny);
+		String output = input;
+		Collection<String> files;
 		
-		Collection<String> files = FsController.listFileTree(output);
+		if(keep){
+			File destiny = new File (source.getAbsolutePath() + ".enc");
+			System.out.println(destiny.getAbsolutePath());
+			FsController.copyDirectory(source, destiny);
+			files = FsController.listFileTree(destiny.getAbsolutePath());
+		}
+		else{
+			files = FsController.listFileTree(output);
+		}
 		for (String f: files) {
 			FileEncryptor.encrypt(f,password, false);
 		}
@@ -65,7 +60,7 @@ public class Cipher {
 	public static void recursiveDecryptor (String path, String password) throws Exception {
 		Collection<String> files = FsController.listFileTree(path);
 		for (String f: files) {
-			FileEncryptor.decrypt(f, password, false);
+			FileEncryptor.decrypt(f, password);
 		}
 	}
 
@@ -124,38 +119,31 @@ public class Cipher {
             //Es dir
             //Es fich
             //
-            if (false) {
+            if (remainingArgs.length < 2) {
                 System.err.println("Error en los parametros");
             } else {
                 String path = remainingArgs[0];
                 String password = remainingArgs[1];
-                int flags;
                 //Ejecuta el algoritmo
-                flags = compruebaFlags(flagEncrypt, keep, path);
-
-                switch (flags) {
-                    case (0):
-                        //recursiveEncrypt(path, path+".enc", password;
-                        break;
-                    case (1):
-                        FileEncryptor.encrypt(path, path + ".enc", password);
-                        break;
-                    case (2):
-                        //recursiveEncrypt(path, path, password);
-                        break;
-                    case (3):
-                        FileEncryptor.encrypt(path, path, password);
-                    case (4):
-                        //recursiveDecrypt(path, path, password);
-                        break;
-                    case (5):
-                        FileEncryptor.decrypt(path, path, password);
-                        break;
-                    default:
-                        System.err.println("Error de las opciones");
-                        break;
-                }
-
+                int flags = checkFlags(flagEncrypt, path);
+                
+                System.out.println((flagEncrypt) ? "Encriptando" : "Desencriptando " + " directorios o archivos...");
+                
+                switch(flags){
+            	case 0 :
+            		FileEncryptor.decrypt(path, password);
+            		break;
+            	case 1 :
+            		FileEncryptor.encrypt(path, password, keep);
+            		break;
+            	case 2 :
+            		recursiveDecryptor(path, password);
+            		break;
+            	case 3 :
+            		recursiveEncryptor(path, password, keep);
+            		break;
+            	}
+                System.out.println("Correctamente " + ((flagEncrypt) ? "Encriptado!" : "Desencriptado!"));
             }
 
         } catch (ParseException ex) {
