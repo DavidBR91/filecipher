@@ -1,35 +1,50 @@
 package com.pis.encriptor;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FsController {
 	
+	public static Collection<String> listFileTree(String path) {
+		File dir = new File(path);
+	    Set<String> fileTree = new HashSet<String>();
+	    for (File entry : dir.listFiles()) {
+	        if (entry.isFile()) fileTree.add(entry.getAbsolutePath());
+	        else fileTree.addAll(listFileTree(entry.getAbsolutePath()));
+	    }
+	    return fileTree;
+	}
 	
-	public static ArrayList<String> walk(String path, ArrayList<String> paths) {
-		
-		ArrayList<String> acf = new ArrayList<String>();
-		acf.addAll(paths);
+	public static void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
+	    if (sourceLocation.isDirectory()) {
+	        if (!targetLocation.exists()) {
+	            targetLocation.mkdir();
+	        }
 
-        File root = new File( path );
-        File[] list = root.listFiles();
+	        String[] children = sourceLocation.list();
+	        for (int i=0; i<children.length; i++) {
+	            copyDirectory(new File(sourceLocation, children[i]),
+	                    new File(targetLocation, children[i]));
+	        }
+	    } else {
 
-        if (list != null){
-            for(File f : list) {
-                if (f.isDirectory()) {
-                	System.out.println("dir");
-                    acf.addAll(walk(f.getAbsolutePath(), acf));
-                }
-                else {
-                    acf.add(f.getAbsoluteFile().getPath());
-                }
-            }
-        }  
-        return acf;
+	        InputStream in = new FileInputStream(sourceLocation);
+	        OutputStream out = new FileOutputStream(targetLocation);
 
-    }
-
-    public static void main(String[] args) {
-        System.out.println(FsController.walk(".", new ArrayList<String>()).toString());
-    }
+	        byte[] buf = new byte[1024];
+	        int len;
+	        while ((len = in.read(buf)) > 0) {
+	            out.write(buf, 0, len);
+	        }
+	        in.close();
+	        out.close();
+	    }
+	}
 }

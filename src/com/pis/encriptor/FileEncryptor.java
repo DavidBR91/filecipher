@@ -3,17 +3,13 @@ package com.pis.encriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.security.SecureRandom;
-
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 public class FileEncryptor{
 
@@ -23,8 +19,24 @@ public class FileEncryptor{
 		  };
 	
 	private static final String ALGORITHM = "PBEWithMD5AndDES";
+	
+	public static void encrypt(String input, String password, Boolean keep) throws Exception{
+		_encrypt(input, input + ".enc",password);
+		if(!keep){
+			File finput = new File(input);
+			File foutput = new File(input + ".enc");
+			foutput.renameTo(finput);
+		}
+	}
+	
+	public static void decrypt(String input, String password) throws Exception{
+		_decrypt(input, input + ".dec", password);
+		File finput = new File(input);
+		File foutput = new File(input + ".dec");
+		foutput.renameTo(finput);
+	}
 
-	public static void encrypt(String input, String output, String password) throws Exception{	 
+	private static void _encrypt(String input, String output, String password) throws Exception{	 
 		//opening streams
 		File filein, fileout;
 		filein=new File(input);
@@ -58,7 +70,7 @@ public class FileEncryptor{
         cout.close();
 	}
 
-	public static void decrypt(String input, String output, String password) throws Exception{
+	private static void _decrypt(String input, String output, String password) throws Exception{
 		//opening streams
 		File filein, fileout;
 		filein=new File(input);
@@ -83,17 +95,11 @@ public class FileEncryptor{
 		byte[] buf = new byte[1024];
 		int read=0;
 		while((read=cin.read(buf))!=-1){ //reading encrypted data
-			System.out.println(read);
 			fos.write(buf,0,read);  //writing decrypted data
 		}
 		//closing streams
 		cin.close();
         fos.flush();
         fos.close();
-	}
-
-	public static void main (String[] args)throws Exception {
-		FileEncryptor.encrypt("/home/fernando/bin","/home/fernando/prueba1.enc.txt","12345678913");
-		FileEncryptor.decrypt("/home/fernando/bin","/home/fernando/prueba1.dec.txt","");
 	}
 }
