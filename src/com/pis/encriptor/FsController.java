@@ -29,7 +29,7 @@ public class FsController {
 	        }
 
 	        String[] children = sourceLocation.list();
-	        for (int i=0; i<children.length; i++) {
+	        for (int i=0; i<children.length-1; i++) {
 	            copyDirectory(new File(sourceLocation, children[i]),
 	                    new File(targetLocation, children[i]));
 	        }

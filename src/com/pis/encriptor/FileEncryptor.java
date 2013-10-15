@@ -12,6 +12,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 public class FileEncryptor{
+	
+	private final static String pass = "password";
 
 	private static final byte[] salt = {
 		    (byte)0xc7, (byte)0x73, (byte)0x21, (byte)0x8c,
@@ -47,7 +49,7 @@ public class FileEncryptor{
 		
 		//generating key
 		PBEParameterSpec pbeParamSpec = new PBEParameterSpec(salt,5000);
-		PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+		PBEKeySpec pbeKeySpec = new PBEKeySpec(pass.toCharArray());
 		
 		SecretKeyFactory keyFac = SecretKeyFactory.getInstance(ALGORITHM);
 		
@@ -60,14 +62,13 @@ public class FileEncryptor{
 
 		byte[] buf = new byte[1024];
 		int read = 0;
+		
 		while((read=fis.read(buf))!=-1){
 			cout.write(buf,0,read);  //writing encrypted data
 		}//reading data
 		//closing streams
 		
 		fis.close();
-        cout.flush();
-        cout.close();
 	}
 
 	private static void _decrypt(String input, String output, String password) throws Exception{
@@ -81,7 +82,7 @@ public class FileEncryptor{
 		
 		//generating key
 		PBEParameterSpec pbeParamSpec = new PBEParameterSpec(salt,5000);
-		PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+		PBEKeySpec pbeKeySpec = new PBEKeySpec(pass.toCharArray());
 		
 		SecretKeyFactory keyFac = SecretKeyFactory.getInstance(ALGORITHM);
 		
@@ -98,8 +99,6 @@ public class FileEncryptor{
 			fos.write(buf,0,read);  //writing decrypted data
 		}
 		//closing streams
-		cin.close();
-        fos.flush();
         fos.close();
 	}
 }

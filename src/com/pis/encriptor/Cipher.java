@@ -25,7 +25,7 @@ public class Cipher {
     	if(!encrypt) fencrypt = 0;
     	if(!esDirectorio(path)) fdir = 0;
     	
-    	return fdir | fencrypt;
+    	return fencrypt | fdir;
         
     }
 
@@ -93,9 +93,9 @@ public class Cipher {
                 return;
             }
 
-            if (cmdLine.hasOption("e")) {
+            if (cmdLine.hasOption("d")) {
                 flagEncrypt = true;
-            } else if (cmdLine.hasOption("d")) {
+            } else if (cmdLine.hasOption("e")) {
                 flagEncrypt = false;
             }
 
@@ -118,7 +118,7 @@ public class Cipher {
             //Es dir
             //Es fich
             //
-            if (remainingArgs.length < 2) {
+            if (remainingArgs.length < 1) {
                 System.err.println("Error en los parametros");
             } else {
                 String path = remainingArgs[0];
@@ -126,7 +126,7 @@ public class Cipher {
                 //Ejecuta el algoritmo
                 int flags = checkFlags(flagEncrypt, path);
                 
-                System.out.println(((flagEncrypt) ? "Encriptando" : "Desencriptando ") + " directorios o archivos...");
+                System.out.println("Realizando operacion...");
                 
                 switch(flags){
             	case 0 :
@@ -142,16 +142,11 @@ public class Cipher {
             		recursiveEncryptor(path, password, keep);
             		break;
             	}
-                System.out.println("Correctamente " + ((flagEncrypt) ? "Encriptado!" : "Desencriptado!"));
+                System.out.println("Correctamente realizada");
             }
 
-        } catch (ParseException ex) {
-            Logger.getLogger(Cipher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (java.lang.NumberFormatException ex) {
-            // Error, imprimimos la ayuda  
-            new HelpFormatter().printHelp(Cipher.class.getCanonicalName(), options);
         } catch (Exception ex) {
-            Logger.getLogger(Cipher.class.getName()).log(Level.SEVERE, null, ex);
+        	 new HelpFormatter().printHelp(Cipher.class.getCanonicalName(), options);
         }
 
     }
